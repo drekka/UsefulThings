@@ -15,7 +15,7 @@ class UserDefaultsObserverTests: XCTestCase {
         private var observer: UserDefaultsObserver<URL>!
 
         init() {
-            observer = UserDefaultsObserver(key: "abc") { [weak self]  _, newUrl in
+            observer = UserDefaultsObserver(key: "abc") { [weak self] _, newUrl in
                 if let url = newUrl {
                     self?.doSomething(with: url)
                 }
@@ -27,101 +27,101 @@ class UserDefaultsObserverTests: XCTestCase {
 
     func testObservingFirstChange() {
         runTest { $0.set("xyz", forKey: "abc") }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old).to(beNil())
-            expect(new as? String) == "xyz"
-            expect(mock.observers.count) == 1
-            expect(mock.store["abc"] as? String) == "xyz"
-            expect(mock.store["abc_previous"] as? String) == "xyz"
-        }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old).to(beNil())
+                expect(new as? String) == "xyz"
+                expect(mock.observers.count) == 1
+                expect(mock.store["abc"] as? String) == "xyz"
+                expect(mock.store["abc_previous"] as? String) == "xyz"
+            }
     }
 
     func testObservingSecondChange() {
         runTest { $0.set("123", forKey: "abc") }
-        setup: {
-            $0.store["abc"] = "xyz"
-            $0.store["abc_previous"] = "xyz"
-        }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old as? String) == "xyz"
-            expect(new as? String) == "123"
-            expect(mock.observers.count) == 1
-            expect(mock.store["abc"] as? String) == "123"
-            expect(mock.store["abc_previous"] as? String) == "123"
-        }
+            setup: {
+                $0.store["abc"] = "xyz"
+                $0.store["abc_previous"] = "xyz"
+            }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old as? String) == "xyz"
+                expect(new as? String) == "123"
+                expect(mock.observers.count) == 1
+                expect(mock.store["abc"] as? String) == "123"
+                expect(mock.store["abc_previous"] as? String) == "123"
+            }
     }
 
     func testObservingSecondChangeToNil() {
         runTest { $0.set(nil, forKey: "abc") }
-        setup: {
-            $0.store["abc"] = "xyz"
-            $0.store["abc_previous"] = "xyz"
-        }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old as? String) == "xyz"
-            expect(new as? String) == nil
-            expect(mock.observers.count) == 1
-            expect(mock.store["abc"] as? String).to(beNil())
-            expect(mock.store["abc_previous"] as? String).to(beNil())
-        }
+            setup: {
+                $0.store["abc"] = "xyz"
+                $0.store["abc_previous"] = "xyz"
+            }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old as? String) == "xyz"
+                expect(new as? String) == nil
+                expect(mock.observers.count) == 1
+                expect(mock.store["abc"] as? String).to(beNil())
+                expect(mock.store["abc_previous"] as? String).to(beNil())
+            }
     }
 
     func testObservingIgnoresChangeWithSameValue() {
         runTest { $0.set("xyz", forKey: "abc") }
-        setup: {
-            $0.store["abc"] = "xyz"
-            $0.store["abc_previous"] = "xyz"
-        }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == false
-            expect(old).to(beNil())
-            expect(new).to(beNil())
-            expect(mock.store["abc"] as? String) == "xyz"
-            expect(mock.store["abc_previous"] as? String) == "xyz"
-        }
+            setup: {
+                $0.store["abc"] = "xyz"
+                $0.store["abc_previous"] = "xyz"
+            }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == false
+                expect(old).to(beNil())
+                expect(new).to(beNil())
+                expect(mock.store["abc"] as? String) == "xyz"
+                expect(mock.store["abc_previous"] as? String) == "xyz"
+            }
     }
 
     func testInitTriggersClosureWhenValueSetupExternally() {
         runTest { _ in }
-        setup: {
-            $0.store["abc"] = "xyz"
-        }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old as? String) == nil
-            expect(new as? String) == "xyz"
-            expect(mock.store["abc"] as? String) == "xyz"
-            expect(mock.store["abc_previous"] as? String) == "xyz"
-        }
+            setup: {
+                $0.store["abc"] = "xyz"
+            }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old as? String) == nil
+                expect(new as? String) == "xyz"
+                expect(mock.store["abc"] as? String) == "xyz"
+                expect(mock.store["abc_previous"] as? String) == "xyz"
+            }
     }
 
     func testInitTriggersClosureWhenValueChangedExternally() {
         runTest { _ in }
-        setup: {
-            $0.store["abc_previous"] = "xyz"
-            $0.store["abc"] = "123"
-        }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old as? String) == "xyz"
-            expect(new as? String) == "123"
-            expect(mock.store["abc"] as? String) == "123"
-            expect(mock.store["abc_previous"] as? String) == "123"
-        }
+            setup: {
+                $0.store["abc_previous"] = "xyz"
+                $0.store["abc"] = "123"
+            }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old as? String) == "xyz"
+                expect(new as? String) == "123"
+                expect(mock.store["abc"] as? String) == "123"
+                expect(mock.store["abc_previous"] as? String) == "123"
+            }
     }
 
     func testObservingChangeWhenPersistStateOff() {
         runTest(persistState: false) { $0.set("xyz", forKey: "abc") }
-        validation: { mock, closureCalled, old, new in
-            expect(closureCalled) == true
-            expect(old) == nil
-            expect(new as? String) == "xyz"
-            expect(mock.store["abc"] as? String) == "xyz"
-            expect(mock.store["abc_previous"]) == nil
-        }
+            validation: { mock, closureCalled, old, new in
+                expect(closureCalled) == true
+                expect(old) == nil
+                expect(new as? String) == "xyz"
+                expect(mock.store["abc"] as? String) == "xyz"
+                expect(mock.store["abc_previous"]) == nil
+            }
     }
 
     // MARK: - Internal

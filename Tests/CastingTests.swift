@@ -20,4 +20,13 @@ class CastingTests: XCTestCase {
         expect(cast("") as URL?).to(beNil())
         expect(cast(nil) as URL?).to(beNil())
     }
+    
+    func testCastFromOptional() {
+        let x: Any? = 5
+        if let x = cast(x) as Int? {
+            expect(x) == 5
+            return
+        }
+        fail("Cast failed")
+     }
 }

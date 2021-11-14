@@ -1,13 +1,9 @@
 //
-//  File.swift
-//
-//
 //  Created by Derek Clarkson on 18/9/21.
 //
 
 import Combine
 import UIKit
-import XCTest
 
 /// Protocol duplicating used funcitons from UserDeaults so that mocks can be used for testing.
 public protocol ObservableUserDefaults {
@@ -39,7 +35,6 @@ public class UserDefaultsObserver<T>: NSObject where T: Equatable {
                 defaults: ObservableUserDefaults = UserDefaults.standard,
                 persistState: Bool = true,
                 onChange: @escaping (T?, T?) -> Void) {
-
         self.defaults = defaults
         self.key = key
         self.onChange = onChange
@@ -47,8 +42,8 @@ public class UserDefaultsObserver<T>: NSObject where T: Equatable {
 
         super.init()
 
-        if persistState {
-            notify(old: defaults.object(forKey: key + persistedKeySuffix), new: defaults.object(forKey: key))
+        if self.persistState {
+            notify(old: self.defaults.object(forKey: key + persistedKeySuffix), new: defaults.object(forKey: key))
         }
 
         defaults.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
